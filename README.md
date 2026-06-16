@@ -6,7 +6,7 @@ Compiled by **Neal Saeed** from the IGMH Common Drug Doses handbook.
 
 ## 🌐 Live Site
 
-> Hosted via GitHub Pages — [your-username.github.io/your-repo-name](https://your-username.github.io/your-repo-name)
+> Hosted via GitHub Pages — [[your-username.github.io/your-repo-name](https://your-username.github.io/your-repo-name)](https://dranoof.github.io/myportal/)
 
 ---
 
