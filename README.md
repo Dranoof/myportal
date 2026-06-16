@@ -1,9 +1,5 @@
-# IGMH Drug Reference Portal
-
-A fast, offline-capable drug reference portal for Medical Officers at Indira Gandhi Memorial Hospital (IGMH), Maldives.
-
-Compiled by **Neal Saeed** from the IGMH Common Drug Doses handbook.
-
+# ASMH MyPortal
+Crafted with love by Dranoof | All rights reserved 
 ## 🌐 Live Site
 
 > Hosted via GitHub Pages — [[your-username.github.io/your-repo-name](https://your-username.github.io/your-repo-name)](https://dranoof.github.io/myportal/)
