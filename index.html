@@ -1292,6 +1292,115 @@ document.addEventListener('keydown', function(e){
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
 </script>
+
+<script id="guidelines-feature">
+(function() {
+  function initGuidelines() {
+    var filterChips = document.querySelector('.filter-chips');
+    if (filterChips) filterChips.innerHTML = '';
+    
+    var aside = document.querySelector('aside');
+    if (!aside || document.getElementById('guidelinesNavBtn')) return;
+    
+    var div1 = document.createElement('div');
+    div1.className = 'nav-divider';
+    var label1 = document.createElement('div');
+    label1.className = 'nav-label';
+    label1.textContent = 'National Guidelines';
+    var guidelinesBtn = document.createElement('button');
+    guidelinesBtn.className = 'nav-item';
+    guidelinesBtn.id = 'guidelinesNavBtn';
+    guidelinesBtn.innerHTML = '📋 Guidelines';
+    aside.appendChild(div1);
+    aside.appendChild(label1);
+    aside.appendChild(guidelinesBtn);
+    
+    var mainContent = document.getElementById('mainContent');
+    if (!mainContent) return;
+    
+    var gp = document.createElement('div');
+    gp.id = 'guidelinesPanel';
+    gp.style.cssText = 'display:none;padding:24px;max-width:960px;margin:0 auto;';
+    gp.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;"><div><h2 style="margin:0;font-size:1.4rem;font-weight:700;color:#1a5f7a;">📋 National Guidelines</h2><p style="margin:4px 0 0;color:#666;font-size:0.85rem;">Upload and store clinical guidelines. Files are saved locally in your browser.</p></div><label id="guidelinesUploadLabel" style="display:inline-flex;align-items:center;gap:8px;background:#1a5f7a;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><span>⬆️</span> Upload Guideline<input type="file" id="guidelinesFileInput" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.xlsx,.csv" style="display:none;"></label></div><div id="guidelinesSearch" style="margin-bottom:18px;display:none;"><input type="text" id="guidelinesSearchInput" placeholder="🔍 Search guidelines..." style="width:100%;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.9rem;box-sizing:border-box;"></div><div id="guidelinesEmpty" style="text-align:center;padding:60px 20px;color:#999;"><div style="font-size:3rem;margin-bottom:12px;">📂</div><div style="font-size:1.1rem;font-weight:600;margin-bottom:8px;color:#666;">No guidelines uploaded yet</div><div style="font-size:0.85rem;">Upload PDF, Word documents, images, or other files.<br>They will be saved in your browser and available next time.</div></div><div id="guidelinesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;"></div><div id="guidelinesViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;"><div style="background:#fff;border-radius:12px;width:90%;max-width:800px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee;"><span id="guidelinesViewerTitle" style="font-weight:700;font-size:1rem;color:#1a5f7a;"></span><div style="display:flex;gap:10px;"><button id="guidelinesDownloadBtn" style="background:#1a5f7a;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:0.85rem;">⬇️ Download</button><button id="guidelinesCloseViewer" style="background:#eee;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;">✕</button></div></div><div id="guidelinesViewerContent" style="flex:1;overflow:auto;padding:0;"></div></div></div>';
+    mainContent.appendChild(gp);
+    
+    var DB_KEY = 'asmh_guidelines';
+    function loadFiles(){try{return JSON.parse(localStorage.getItem(DB_KEY)||'[]');}catch(e){return[];}}
+    function saveFiles(files){try{localStorage.setItem(DB_KEY,JSON.stringify(files));}catch(e){alert('Storage full! Remove some files first.');}}
+    function getFileIcon(type,name){var ext=name.split('.').pop().toLowerCase();if(type.includes('pdf')||ext==='pdf')return '📄';if(type.includes('word')||ext==='doc'||ext==='docx')return '📝';if(type.includes('image')||['png','jpg','jpeg','gif','webp'].includes(ext))return '🖼️';if(type.includes('spreadsheet')||ext==='xlsx'||ext==='csv')return '📊';if(ext==='txt')return '📃';return '📁';}
+    function formatSize(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(1)+' MB';}
+    function formatDate(ts){return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+    
+    function renderGrid(filter){
+      var files=loadFiles();var grid=document.getElementById('guidelinesGrid');var empty=document.getElementById('guidelinesEmpty');var searchBar=document.getElementById('guidelinesSearch');
+      if(!grid)return;
+      var filtered=filter?files.filter(function(f){return f.name.toLowerCase().includes(filter.toLowerCase());}):files;
+      if(files.length>0&&searchBar)searchBar.style.display='block';
+      if(filtered.length===0){grid.innerHTML='';if(empty)empty.style.display='block';return;}
+      if(empty)empty.style.display='none';
+      grid.innerHTML=filtered.map(function(f){return '<div style="background:#fff;border:1.5px solid #e8e8e8;border-radius:10px;padding:16px;position:relative;" onmouseover="this.style.borderColor=\'#1a5f7a\';this.style.boxShadow=\'0 2px 12px rgba(26,95,122,0.15)\'" onmouseout="this.style.borderColor=\'#e8e8e8\';this.style.boxShadow=\'none\'"><div style="font-size:2rem;margin-bottom:10px;">'+getFileIcon(f.type,f.name)+'</div><div style="font-weight:600;font-size:0.85rem;color:#222;word-break:break-word;line-height:1.3;margin-bottom:6px;">'+f.name+'</div><div style="font-size:0.75rem;color:#999;margin-bottom:12px;">'+formatSize(f.size)+' · '+formatDate(f.uploaded)+'</div><div style="display:flex;gap:8px;"><button onclick="window._guidelinesView(\''+f.id+'\')" style="flex:1;background:#e8f4f8;color:#1a5f7a;border:none;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">👁 View</button><button onclick="window._guidelinesDelete(\''+f.id+'\')" style="background:#fff0f0;color:#c0392b;border:none;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;">🗑</button></div></div>';}).join('');
+    }
+    window._guidelinesRender=renderGrid;
+    
+    window._guidelinesView=function(id){
+      var f=loadFiles().find(function(x){return x.id===id;});if(!f)return;
+      var modal=document.getElementById('guidelinesViewerModal');
+      document.getElementById('guidelinesViewerTitle').textContent=f.name;
+      modal.style.display='flex';
+      document.getElementById('guidelinesDownloadBtn').onclick=function(){var a=document.createElement('a');a.href=f.data;a.download=f.name;a.click();};
+      var content=document.getElementById('guidelinesViewerContent');
+      var ext=f.name.split('.').pop().toLowerCase();
+      if(f.type.includes('pdf')||ext==='pdf'){content.innerHTML='<iframe src="'+f.data+'" style="width:100%;height:70vh;border:none;"></iframe>';}
+      else if(f.type.includes('image')||['png','jpg','jpeg','gif','webp'].includes(ext)){content.innerHTML='<img src="'+f.data+'" style="max-width:100%;display:block;margin:auto;padding:16px;">';}
+      else if(ext==='txt'){try{var text=atob(f.data.split(',')[1]);content.innerHTML='<pre style="padding:16px;white-space:pre-wrap;font-size:0.9rem;color:#333;">'+text.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';}catch(e){content.innerHTML='<p style="padding:16px;color:#666;">Cannot preview. Use Download button.</p>';}}
+      else{content.innerHTML='<div style="padding:40px;text-align:center;color:#666;"><div style="font-size:3rem;margin-bottom:12px;">📁</div><p>Preview not available.</p><p style="font-size:0.85rem;">Use the Download button to open.</p></div>';}
+    };
+    
+    window._guidelinesDelete=function(id){
+      if(!confirm('Delete this guideline?'))return;
+      saveFiles(loadFiles().filter(function(f){return f.id!==id;}));
+      renderGrid(document.getElementById('guidelinesSearchInput')?document.getElementById('guidelinesSearchInput').value:'');
+      var t=document.createElement('div');t.textContent='Guideline deleted';t.style.cssText='position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:10px 18px;border-radius:8px;z-index:99999;font-size:0.85rem;';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);
+    };
+    
+    document.getElementById('guidelinesCloseViewer').onclick=function(){document.getElementById('guidelinesViewerModal').style.display='none';document.getElementById('guidelinesViewerContent').innerHTML='';};
+    
+    document.getElementById('guidelinesFileInput').addEventListener('change',function(e){
+      var files=Array.from(e.target.files);if(!files.length)return;
+      var loaded=0;var existing=loadFiles();
+      files.forEach(function(file){
+        var reader=new FileReader();
+        reader.onload=function(ev){
+          existing.push({id:'g_'+Date.now()+'_'+Math.random().toString(36).substr(2,6),name:file.name,type:file.type,size:file.size,data:ev.target.result,uploaded:Date.now()});
+          loaded++;
+          if(loaded===files.length){saveFiles(existing);renderGrid('');var t=document.createElement('div');t.textContent=files.length+' file'+(files.length>1?'s':'')+' uploaded!';t.style.cssText='position:fixed;bottom:20px;right:20px;background:#1a5f7a;color:#fff;padding:10px 18px;border-radius:8px;z-index:99999;font-size:0.85rem;';document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
+        };
+        reader.readAsDataURL(file);
+      });
+      this.value='';
+    });
+    
+    var searchInput=document.getElementById('guidelinesSearchInput');
+    if(searchInput)searchInput.addEventListener('input',function(){renderGrid(this.value);});
+    
+    document.getElementById('guidelinesNavBtn').addEventListener('click',function(){
+      var welcome=document.getElementById('welcomeScreen');if(welcome)welcome.style.display='none';
+      var notes=document.getElementById('notesPanel');if(notes)notes.style.display='none';
+      document.querySelectorAll('#mainContent > div').forEach(function(d){if(d.id!=='guidelinesPanel')d.style.display='none';});
+      document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      document.getElementById('guidelinesPanel').style.display='block';
+      renderGrid(searchInput?searchInput.value:'');
+    });
+    
+    if(window.showCat&&!window._showCatGLPatch){window._showCatGLPatch=true;var origCat=window.showCat;window.showCat=function(k){var gpx=document.getElementById('guidelinesPanel');if(gpx)gpx.style.display='none';origCat(k);};}
+    if(window.showPanel&&!window._showPanelGLPatch){window._showPanelGLPatch=true;var origPanel=window.showPanel;window.showPanel=function(n){var gpx=document.getElementById('guidelinesPanel');if(gpx)gpx.style.display='none';origPanel(n);};}
+  }
+  
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initGuidelines);}
+  else{initGuidelines();}
+})();
+</script>
 </body>
 </html>
  
