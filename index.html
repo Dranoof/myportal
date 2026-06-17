@@ -302,7 +302,65 @@
     }
     body.dark #searchInput { color: #fff; }
     body.dark .ho-table tr:hover td { background: rgba(255,255,255,0.02); }
-  </style>
+  
+    /* Chart styles */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .chart-card {
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .chart-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted, #6b7280);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    /* Handover table styles */
+    .handover-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .handover-table th {
+      background: var(--navy, #1a2e4a);
+      color: #fff;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-weight: 500;
+    }
+    .handover-table td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--border, #e5e7eb);
+      vertical-align: top;
+    }
+    .handover-table tr:nth-child(even) td {
+      background: var(--stripe, rgba(0,0,0,0.02));
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-red { background:#fee2e2; color:#dc2626; }
+    .badge-amber { background:#fef3c7; color:#d97706; }
+    .badge-green { background:#dcfce7; color:#16a34a; }
+    .badge-blue { background:#dbeafe; color:#2563eb; }
+    .badge-purple { background:#ede9fe; color:#7c3aed; }
+    .badge-gray { background:#f3f4f6; color:#6b7280; }
+    .spinner { text-align:center; color:var(--text-muted,#6b7280); padding:2rem; font-size:0.9rem; }
+</style>
 </head>
 <body>
 <!-- ══ HEADER ══ -->
@@ -403,4 +461,437 @@
             <div class="cat-card" onclick="showCatByKey('dermatology')"><span class="cat-dot" style="background:#D4A827"></span><div><div class="cat-name">Dermatology</div><div class="cat-count">14 drugs</div></div></div>
             <div class="cat-card" onclick="showCatByKey('eyes')"><span class="cat-dot" style="background:#2AACAC"></span><div><div class="cat-name">Eyes &amp; ENT</div><div class="cat-count">12 drugs</div></div></div>
             <div class="cat-card" onclick="showCatByKey('psychiatry')"><span class="cat-dot" style="background:#9B6FB5"></span><div><div class="cat-name">Psychiatry</div><div class="cat-count">16 drugs</div></div></div>
-            <div class="cat-card" onclick="showCatByKey('antibiotics')"><span class="cat-dot" style="background:#2EAA5C"></span><div><div class="cat-name">Antibiotics</div><div class="
+            <div class="cat-card" onclick="atByKey('antibiotics')"><span class="cat-dot" style="background:#2EAA5C"></span><div><div class="cat-name">Antibiotics</div><div class="cat-count">13 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('antifungal')"><span class="cat-dot" style="background:#E8833C"></span><div><div class="cat-name">Antifungal / Antiviral</div><div class="cat-count">8 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('vitamins')"><span class="cat-dot" style="background:#5B7FD5"></span><div><div class="cat-name">Vitamins &amp; Misc</div><div class="cat-count">10 drugs</div></div></div>
+            </div>
+          </div>
+          <div class="dash-section">
+            <div class="dash-section-label">Paediatrics</div>
+            <div class="cat-grid">
+              <div class="cat-card" onclick="showCatByKey('paeds-opd')"><span class="cat-dot" style="background:#E05252"></span><div><div class="cat-name">Paeds OPD</div><div class="cat-count">20 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('paeds-acute')"><span class="cat-dot" style="background:#5B9BD5"></span><div><div class="cat-name">Paeds Acute</div><div class="cat-count">8 drugs</div></div></div>
+            </div>
+          </div>
+          <div class="dash-section">
+            <div class="dash-section-label">Special Populations</div>
+            <div class="cat-grid">
+              <div class="cat-card" onclick="showCatByKey('gynae')"><span class="cat-dot" style="background:#D45E9B"></span><div><div class="cat-name">Gynaecology</div><div class="cat-count">8 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('pregnancy')"><span class="cat-dot" style="background:#2AACAC"></span><div><div class="cat-name">Pregnancy</div><div class="cat-count">14 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('lactation')"><span class="cat-dot" style="background:#5EBF5E"></span><div><div class="cat-name">Lactation</div><div class="cat-count">12 drugs</div></div></div>
+              <div class="cat-card" onclick="showCatByKey('g6pd')"><span class="cat-dot" style="background:#D4A827"></span><div><div class="cat-name">G6PD Guide</div><div class="cat-count">—</div></div></div>
+            </div>
+          </div>
+          <!-- Dashboard Charts Section -->
+          <div class="dash-section" id="chartsSection">
+            <div class="dash-section-label">📊 Live Analytics</div>
+            <div class="charts-grid">
+              <div class="chart-card">
+                <div class="chart-title">ER Status Breakdown</div>
+                <canvas id="erStatusChart" width="300" height="220"></canvas>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">ER Cases – Last 7 Days</div>
+                <canvas id="erTrendChart" width="300" height="220"></canvas>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">Inpatients by Department</div>
+                <canvas id="deptChart" width="300" height="220"></canvas>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">Today's Referrals</div>
+                <canvas id="referralChart" width="300" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ER Handover Panel -->
+      <div id="erHandoverPanel" style="display:none; padding:1.5rem;">
+        <h2 style="margin-bottom:1rem; color:var(--navy);">🚨 ER Handover – Active Patients</h2>
+        <div id="erHandoverTable">Loading...</div>
+        <a id="erSheetLink" href="https://docs.google.com/spreadsheets/d/1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE/edit#gid=0" target="_blank" style="display:inline-block;margin-top:1rem;color:var(--teal);font-size:0.85rem;">📄 Open full ER Handover Sheet</a>
+      </div>
+      <!-- Dept Handover Panel -->
+      <div id="deptHandoverPanel" style="display:none; padding:1.5rem;">
+        <h2 style="margin-bottom:1rem; color:var(--navy);">🏥 Department Handover – Inpatients</h2>
+        <div id="deptHandoverTable">Loading...</div>
+        <a id="deptSheetLink" href="https://docs.google.com/spreadsheets/d/1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4/edit" target="_blank" style="display:inline-block;margin-top:1rem;color:var(--teal);font-size:0.85rem;">📄 Open full Dept Handover Sheet</a>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  ASMH MyPortal – Google Sheets Live Data Integration
+//  ER Sheet:   1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE
+//  Dept Sheet: 1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4
+// ═══════════════════════════════════════════════════════════
+
+const ER_SHEET_ID   = '1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE';
+const DEPT_SHEET_ID = '1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4';
+const GVZ = 'https://docs.google.com/spreadsheets/d/';
+
+let _erData = null, _deptData = {}, _erHandoverData = null;
+let erChart = null, trendChart = null, deptChart = null, refChart = null;
+
+// ── Theme ──────────────────────────────────────────────────
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+(function() {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = '☀️';
+  }
+})();
+
+// ── Panel Navigation ────────────────────────────────────────
+function showERHandover() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('erHandoverPanel').style.display = 'block';
+  document.getElementById('deptHandoverPanel').style.display = 'none';
+  document.getElementById('tabER').classList.add('active');
+  document.getElementById('tabDept').classList.remove('active');
+  renderERHandover();
+}
+
+function showDeptHandover() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('erHandoverPanel').style.display = 'none';
+  document.getElementById('deptHandoverPanel').style.display = 'block';
+  document.getElementById('tabDept').classList.add('active');
+  document.getElementById('tabER').classList.remove('active');
+  renderDeptHandover();
+}
+
+function showHome() {
+  document.getElementById('welcomeScreen').style.display = '';
+  document.getElementById('erHandoverPanel').style.display = 'none';
+  document.getElementById('deptHandoverPanel').style.display = 'none';
+  document.getElementById('tabER').classList.remove('active');
+  document.getElementById('tabDept').classList.remove('active');
+}
+
+// ── Category navigation ─────────────────────────────────────
+function showCat(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showCatByKey(key) {
+  const el = document.querySelector(`[data-cat="${key}"]`);
+  if (el) showCat(el);
+}
+
+// ── Search ──────────────────────────────────────────────────
+(function initSearch() {
+  const input = document.getElementById('searchInput');
+  if (!input) return;
+  input.addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.style.display = q === '' || el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+})();
+
+// ══════════════════════════════════════════════════════════
+//  SHEETS DATA LOADING
+// ══════════════════════════════════════════════════════════
+function gvizUrl(sheetId, sheet, range) {
+  return GVZ + sheetId + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(sheet) + (range ? '&range=' + range : '');
+}
+
+function fetchSheet(sheetId, sheet, range) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    let done = false;
+    window[cb] = function(data) {
+      done = true;
+      delete window[cb];
+      script.remove();
+      resolve(data);
+    };
+    script.onerror = () => { if (!done) { delete window[cb]; script.remove(); reject(new Error('Sheet load failed')); } };
+    script.src = gvizUrl(sheetId, sheet, range) + '&tqx=out:json;responseHandler:' + cb;
+    document.head.appendChild(script);
+  });
+}
+
+// ── Parse ER Cases sheet ─────────────────────────────────────
+function parseERCases(data) {
+  const rows = data.table.rows;
+  let total = 0, active = 0, admission = 0;
+  const byStatus = {};
+  const byDate = {};
+  const referrals = {};
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (const row of rows) {
+    if (!row.c) continue;
+    const cells = row.c;
+    const patNum = cells[1] ? cells[1].v : null;
+    if (typeof patNum !== 'number') continue;
+
+    total++;
+    const rawStatus = cells[8] ? String(cells[8].v || '').trim() : '';
+    const status = rawStatus.toLowerCase();
+    const ref = cells[9] ? String(cells[9].v || '').trim() : '';
+
+    // Date from col 2
+    let dateKey = 'Unknown';
+    if (cells[2] && cells[2].v) {
+      const dv = String(cells[2].v);
+      const dtMatch = dv.match(/Date\((\d+),(\d+),(\d+)/);
+      if (dtMatch) {
+        const d = new Date(+dtMatch[1], +dtMatch[2], +dtMatch[3]);
+        const diff = Math.round((d - today) / 86400000);
+        if (diff >= -6 && diff <= 0) dateKey = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+      }
+    }
+    if (dateKey !== 'Unknown') byDate[dateKey] = (byDate[dateKey] || 0) + 1;
+
+    if (!status) { active++; }
+    else if (status.includes('discharge')) { /* discharged */ }
+    else if (status.includes('admission') || status.includes('admit')) { admission++; }
+    else if (status.includes('labs') || status.includes('pending')) { active++; }
+    else { active++; }
+
+    byStatus[rawStatus] = (byStatus[rawStatus] || 0) + 1;
+    if (ref && ref.length > 1) referrals[ref] = (referrals[ref] || 0) + 1;
+  }
+
+  return { total, active, admission, byStatus, byDate, referrals };
+}
+
+// ── Parse ER Handover (active patients in ER) ───────────────
+function parseERHandover(data) {
+  const rows = data.table.rows;
+  const patients = [];
+  for (const row of rows) {
+    if (!row.c) continue;
+    const cells = row.c;
+    const name = cells[5] ? String(cells[5].v || '').trim() : '';
+    const bed = cells[1] ? String(cells[1].v || '').trim() : '';
+    const arrival = cells[3] ? String(cells[3].v || '').trim() : '';
+    const id = cells[4] ? String(cells[4].v || '').trim() : '';
+    const age = cells[6] ? String(cells[6].v || '').trim() : '';
+    const dx = cells[7] ? String(cells[7].v || '').trim() : '';
+    const doctor = cells[8] ? String(cells[8].v || '').trim() : '';
+    const status = cells[9] ? String(cells[9].v || '').trim() : '';
+    const ref = cells[10] ? String(cells[10].v || '').trim() : '';
+    if (name && name.length > 1 && !name.startsWith('*') && !name.startsWith('Bed') && !name.startsWith('Name') && !name.toUpperCase().startsWith('DEPT')) {
+      patients.push({ bed, arrival, id, name, age, dx, doctor, status, ref });
+    }
+  }
+  return patients;
+}
+
+// ── Parse Dept sheet ─────────────────────────────────────────
+function parseDeptSheet(data, deptName) {
+  const rows = data.table.rows;
+  const patients = [];
+  for (const row of rows) {
+    if (!row.c) continue;
+    const cells = row.c;
+    const status = cells[4] ? String(cells[4].v || '').trim() : '';
+    const name = cells[5] ? String(cells[5].v || '').trim() : '';
+    if (!name || name.length < 2) continue;
+    if (name.toUpperCase().startsWith('NAME') || name.startsWith('*')) continue;
+    const admDate = cells[1] ? String(cells[1].v || '').trim() : '';
+    const bed = cells[2] ? String(cells[2].v || '').trim() : '';
+    const dept = cells[3] ? String(cells[3].v || '').trim() : deptName;
+    const id = cells[6] ? String(cells[6].v || '').trim() : '';
+    const ageSex = cells[7] ? String(cells[7].v || '').trim() : '';
+    const dx = cells[8] ? String(cells[8].v || '').trim() : '';
+    patients.push({ admDate, bed, dept, status, name, id, ageSex, dx });
+  }
+  return patients;
+}
+
+// ── Render ER Handover table ─────────────────────────────────
+function renderERHandover() {
+  const el = document.getElementById('erHandoverTable');
+  if (!_erHandoverData) {
+    el.innerHTML = '<div class="spinner">⏳ Loading ER data…</div>';
+    return;
+  }
+  if (_erHandoverData.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-muted)">No active patients in ER right now.</p>';
+    return;
+  }
+  let html = '<table class="handover-table"><thead><tr><th>Bed</th><th>Arrival</th><th>Name</th><th>Age</th><th>Diagnosis</th><th>Doctor</th><th>Status</th><th>Referral</th></tr></thead><tbody>';
+  for (const p of _erHandoverData) {
+    const badge = statusBadge(p.status);
+    html += `<tr><td>${p.bed}</td><td>${p.arrival}</td><td><strong>${p.name}</strong><br><small>${p.id}</small></td><td>${p.age}</td><td>${p.dx}</td><td>${p.doctor}</td><td>${badge}</td><td>${p.ref}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ── Render Dept Handover table ───────────────────────────────
+function renderDeptHandover() {
+  const el = document.getElementById('deptHandoverTable');
+  if (Object.keys(_deptData).length === 0) {
+    el.innerHTML = '<div class="spinner">⏳ Loading department data…</div>';
+    return;
+  }
+  let html = '';
+  for (const [dept, patients] of Object.entries(_deptData)) {
+    if (patients.length === 0) continue;
+    html += `<h3 style="margin:1.2rem 0 0.5rem; color:var(--navy)">${dept} <span style="font-weight:400; font-size:0.8rem; color:var(--text-muted)">(${patients.length} patients)</span></h3>`;
+    html += '<table class="handover-table"><thead><tr><th>Adm. Date</th><th>Bed</th><th>Name</th><th>Age/Sex</th><th>Diagnosis</th><th>Status</th></tr></thead><tbody>';
+    for (const p of patients) {
+      const badge = statusBadge(p.status);
+      html += `<tr><td>${p.admDate}</td><td>${p.bed}</td><td><strong>${p.name}</strong><br><small>${p.id}</small></td><td>${p.ageSex}</td><td>${p.dx}</td><td>${badge}</td></tr>`;
+    }
+    html += '</tbody></table>';
+  }
+  el.innerHTML = html || '<p style="color:var(--text-muted)">No inpatient data available.</p>';
+}
+
+function statusBadge(status) {
+  const s = (status || '').toLowerCase();
+  if (s.includes('discharge')) return `<span class="badge badge-green">${status}</span>`;
+  if (s.includes('admit')) return `<span class="badge badge-red">${status}</span>`;
+  if (s.includes('labs') || s.includes('imaging')) return `<span class="badge badge-blue">${status}</span>`;
+  if (s.includes('pending')) return `<span class="badge badge-amber">${status}</span>`;
+  if (s.includes('refer')) return `<span class="badge badge-purple">${status}</span>`;
+  return `<span class="badge badge-gray">${status || '—'}</span>`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  CHARTS
+// ══════════════════════════════════════════════════════════
+const CHART_COLORS = ['#E05252','#5B9BD5','#3DAA72','#D4A827','#8B6FBF','#2AACAC','#E8963C','#D45E9B'];
+
+function renderERStatusChart(byStatus) {
+  const ctx = document.getElementById('erStatusChart');
+  if (!ctx) return;
+  const labels = Object.keys(byStatus).filter(k => k);
+  const values = labels.map(k => byStatus[k]);
+  if (erChart) erChart.destroy();
+  erChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#fff' }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` } } } }
+  });
+}
+
+function renderTrendChart(byDate) {
+  const ctx = document.getElementById('erTrendChart');
+  if (!ctx) return;
+  // Sort dates
+  const entries = Object.entries(byDate).sort((a, b) => {
+    const da = new Date(a[0]), db = new Date(b[0]);
+    return da - db;
+  });
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Cases', data: values, backgroundColor: '#5B9BD5', borderRadius: 6 }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { font: { size: 9 } } } }, plugins: { legend: { display: false } } }
+  });
+}
+
+function renderDeptChart(deptData) {
+  const ctx = document.getElementById('deptChart');
+  if (!ctx) return;
+  const labels = [], values = [];
+  for (const [dept, patients] of Object.entries(deptData)) {
+    labels.push(dept.replace(' DEPARTMENT','').replace(' / OBG / ORTHO',''));
+    values.push(patients.length);
+  }
+  if (deptChart) deptChart.destroy();
+  deptChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Patients', data: values, backgroundColor: CHART_COLORS, borderRadius: 6 }] },
+    options: { responsive: true, indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+  });
+}
+
+function renderReferralChart(referrals) {
+  const ctx = document.getElementById('referralChart');
+  if (!ctx) return;
+  const entries = Object.entries(referrals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  if (refChart) refChart.destroy();
+  refChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Referrals', data: values, backgroundColor: '#8B6FBF', borderRadius: 6 }] },
+    options: { responsive: true, indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  MAIN LOAD
+// ══════════════════════════════════════════════════════════
+async function loadAllData() {
+  try {
+    // Load ER Cases (full history for stats & charts)
+    const erCasesData = await fetchSheet(ER_SHEET_ID, 'ER CASES');
+    const erStats = parseERCases(erCasesData);
+    _erData = erStats;
+
+    // Update stat cards
+    document.getElementById('stat-er-total').textContent = erStats.total;
+    document.getElementById('stat-er-active').textContent = erStats.active;
+    document.getElementById('stat-er-admit').textContent = erStats.admission;
+
+    // Render ER charts
+    renderERStatusChart(erStats.byStatus);
+    renderTrendChart(erStats.byDate);
+    renderReferralChart(erStats.referrals);
+  } catch(e) {
+    console.warn('ER Cases load failed:', e);
+  }
+
+  try {
+    // Load ER Handover (active patients)
+    const erHovData = await fetchSheet(ER_SHEET_ID, 'HANDOVER');
+    _erHandoverData = parseERHandover(erHovData);
+  } catch(e) {
+    console.warn('ER Handover load failed:', e);
+    _erHandoverData = [];
+  }
+
+  // Load Department sheets
+  const deptSheets = [
+    { name: 'Medicine', sheet: 'MEDICINE' },
+    { name: 'Surgery / OBG / Ortho', sheet: 'SURGERY / OBG / ORTHO' },
+    { name: 'NICU / HDU / ICU', sheet: 'NICU / HDU / ICU' },
+    { name: 'Paediatrics', sheet: 'PEDIATRICS DEPARTMENT' },
+  ];
+
+  let totalInpatients = 0;
+  for (const d of deptSheets) {
+    try {
+      const data = await fetchSheet(DEPT_SHEET_ID, d.sheet);
+      const patients = parseDeptSheet(data, d.name);
+      _deptData[d.name] = patients;
+      totalInpatients += patients.length;
+    } catch(e) {
+      console.warn(d.name + ' load failed:', e);
+      _deptData[d.name] = [];
+    }
+  }
+
+  document.getElementById('stat-inpatients').textContent = totalInpatients;
+  renderDeptChart(_deptData);
+}
+
+// Kick off on page load
+window.addEventListener('DOMContentLoaded', loadAllData);
+</script>
+</body>
+</html>
