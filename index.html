@@ -510,13 +510,11 @@
       <div id="erHandoverPanel" style="display:none; padding:1.5rem;">
         <h2 style="margin-bottom:1rem; color:var(--navy);">🚨 ER Handover – Active Patients</h2>
         <div id="erHandoverTable">Loading...</div>
-        <a id="erSheetLink" href="https://docs.google.com/spreadsheets/d/1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE/edit#gid=0" target="_blank" style="display:inline-block;margin-top:1rem;color:var(--teal);font-size:0.85rem;">📄 Open full ER Handover Sheet</a>
       </div>
       <!-- Dept Handover Panel -->
       <div id="deptHandoverPanel" style="display:none; padding:1.5rem;">
         <h2 style="margin-bottom:1rem; color:var(--navy);">🏥 Department Handover – Inpatients</h2>
         <div id="deptHandoverTable">Loading...</div>
-        <a id="deptSheetLink" href="https://docs.google.com/spreadsheets/d/1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4/edit" target="_blank" style="display:inline-block;margin-top:1rem;color:var(--teal);font-size:0.85rem;">📄 Open full Dept Handover Sheet</a>
       </div>
     </main>
   </div>
@@ -524,14 +522,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════
-//  ASMH MyPortal – Google Sheets Live Data Integration
-//  ER Sheet:   1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE
-//  Dept Sheet: 1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4
+//  ASMH MyPortal – Google Sheet connection removed (no patient data loaded)
 // ═══════════════════════════════════════════════════════════
 
-const ER_SHEET_ID   = '1QIrXpL3iukUIyy2fVTHVya9Fp_DegpLYAxsvGJ0GnOE';
-const DEPT_SHEET_ID = '1hqZ6IBS_hkCu_1fFgkTlmgG04whLpZYf1FueUX8ijO4';
-const GVZ = 'https://docs.google.com/spreadsheets/d/';
+const ER_SHEET_ID = null, DEPT_SHEET_ID = null;
 
 let _erData = null, _deptData = {}, _erHandoverData = null;
 let erChart = null, trendChart = null, deptChart = null, refChart = null;
@@ -603,26 +597,7 @@ function showCatByKey(key) {
 // ══════════════════════════════════════════════════════════
 //  SHEETS DATA LOADING
 // ══════════════════════════════════════════════════════════
-function gvizUrl(sheetId, sheet, range) {
-  return GVZ + sheetId + '/gviz/tq?sheet=' + encodeURIComponent(sheet) + (range ? '&range=' + range : '');
-}
-
-function fetchSheet(sheetId, sheet, range) {
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Math.random().toString(36).slice(2);
-    const script = document.createElement('script');
-    let done = false;
-    window[cb] = function(data) {
-      done = true;
-      delete window[cb];
-      script.remove();
-      resolve(data);
-    };
-    script.onerror = () => { if (!done) { delete window[cb]; script.remove(); reject(new Error('Sheet load failed')); } };
-    script.src = gvizUrl(sheetId, sheet, range) + '&tqx=out:json;responseHandler:' + cb;
-    document.head.appendChild(script);
-  });
-}
+function fetchSheet() { return Promise.reject(new Error('Sheet connection removed')); }
 
 // ── Parse ER Cases sheet ─────────────────────────────────────
 function parseERCases(data) {
